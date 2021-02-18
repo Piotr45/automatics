@@ -87,4 +87,4 @@ tmp = Simulation({
             'Simulation cycles': 300
         })
 
-tmp.simulation()
+#tmp.simulation()
