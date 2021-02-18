@@ -2,14 +2,14 @@ class Simulation:
     def __init__(self, config):
         self.__config__ = config
         self.__data__ = {
-            'Delivered heat': [],
-            'Heat loss': [],
-            'Errors': [],
-            'Quantity': [],
-            'Temperature': [],
-            'Sum of errors': []
+            'Delivered heat': [0] * self.__config__['Simulation cycles'],
+            'Heat loss': [0] * self.__config__['Simulation cycles'],
+            'Errors': [0] * self.__config__['Simulation cycles'],
+            'Quantity': [0] * self.__config__['Simulation cycles'],
+            'Temperature': [0] * self.__config__['Simulation cycles'],
+            'Time': [_ for _ in range(0, self.__config__['Simulation cycles'])]
         }
-        self.__data__['Errors'].append(0)
+        self.sum_of_errors = 0
 
     @staticmethod
     def minmax(minimum, maximum, value):
@@ -25,12 +25,12 @@ class Simulation:
         return self.__data__['Errors'][index] - self.__data__['Errors'][index - 1]
 
     def sum_errors(self, index) -> None:
-        self.__data__['Sum of errors'] += self.__data__['Errors'][index]
+        self.sum_of_errors += self.__data__['Errors'][index]
 
     def new_control_quantity_value(self, index) -> float:
         return self.__config__['Kp'] * (
                 self.__data__['Errors'][index] + (self.__config__['Tp'] / self.__config__['Ti']) *
-                self.__data__['Sum of errors'] + (
+                self.sum_of_errors + (
                         self.__config__['Td'] / self.__config__['Tp']) * self.find_delta_error(index))
 
     def append_element_to_control_quantity_list(self, index) -> None:
@@ -55,36 +55,36 @@ class Simulation:
         self.__config__['Current water temperature'] = self.__data__['Temperature'][index + 1]
 
     def simulation(self):
-        print(self.__config__['Simulation cycles'])
-        print(type(self.__config__['Simulation cycles']))
         for index in range(0, self.__config__['Simulation cycles']):
             self.find_error(index)
             self.sum_errors(index)
             self.append_element_to_control_quantity_list(index)
             self.count_heat_gain(index)
             self.count_heat_loss(index)
-            self.update_temperature(index)
+            if index == self.__config__['Simulation cycles']-1:
+                pass
+            else:
+                self.update_temperature(index)
+        return self.__data__
 
-        print(self.__data__.keys())
 
-
-tmp = Simulation({
-            'K': 0.06,
-            'Kp': 110,
-            'Ki': 0.05,
-            'Kd': 5,
-            'Tp': 0.1,
-            'Ti': None,
-            'Td': None,
-            'Current water temperature': 20,
-            'Temperature goal': 50,
-            'Ambient temperature': 20,
-            'Thermal capacity': 555 / 1,
-            'Quantity minimum': 10,
-            'Quantity maximum': 2200,
-            'Heat gain minimum': 0,
-            'Heat gain maximum': 41900,
-            'Simulation cycles': 300
-        })
-
-tmp.simulation()
+# tmp = Simulation({
+#             'K': 0.06,
+#             'Kp': 110,
+#             'Ki': 0.05,
+#             'Kd': 5,
+#             'Tp': 0.1,
+#             'Ti': 110/0.05,
+#             'Td': 5/110,
+#             'Current water temperature': 20,
+#             'Temperature goal': 50,
+#             'Ambient temperature': 20,
+#             'Thermal capacity': 555 / 1,
+#             'Quantity minimum': 10,
+#             'Quantity maximum': 2200,
+#             'Heat gain minimum': 0,
+#             'Heat gain maximum': 41900,
+#             'Simulation cycles': 300
+#         })
+#
+# tmp.simulation()

@@ -22,11 +22,11 @@ class SimulationWindow:
         self.__config__['Thermal capacity'] = 555 / self.__config__['K']
 
         self.__figure__ = make_subplots(rows=2, cols=3)
-        self.__dataframe__ = self.create_dataframe()
-        self.app.layout = self.create_layout()
 
-        # self.simulation = Simulation(self.__config__, self.__dataframe__)
-        # self.simulation.simulation()
+        self.simulation = Simulation(self.__config__)
+        self.__dataframe__ = DataFrame(self.simulation.simulation())
+
+        self.app.layout = self.create_layout()
 
     @staticmethod
     def create_config() -> dict:
@@ -49,55 +49,94 @@ class SimulationWindow:
             'Simulation cycles': 300
         }
 
-    @staticmethod
-    def create_dataframe(params) -> DataFrame:
-        return DataFrame({
-            'Delivered heat': params[0],
-            'Heat loss': params[1],
-            'Errors': params[2],
-            'Quantity': params[3],
-            'Temperature': params[4],
-            'Sum of errors': params[5]
-        })
+    # @staticmethod
+    # def create_dataframe(params) -> DataFrame:
+    #     return DataFrame({
+    #         'Delivered heat': params[0],
+    #         'Heat loss': params[1],
+    #         'Errors': params[2],
+    #         'Quantity': params[3],
+    #         'Temperature': params[4],
+    #         'Sum of errors': params[5]
+    #     })
 
-    @staticmethod
-    def create_layout() -> html.Div:
+    def create_layout(self) -> html.Div:
         return html.Div([
-            html.H1(children="Water heater", style={'text-align': 'center'}),
-
+            html.H1(children="Water heater", style={'text-align': 'center',
+                                                    'color': 'white',
+                                                    'background-color': 'darkslategrey'
+                                                    }),
+            html.Link(rel='stylesheet', href='stylesheet.css'),
             html.Div(children=[
                 html.Label('K'),
-                dcc.Input(value=0.06, type='number', step=0.01, id='k', min=0.01, max=0.25),
+                dcc.Input(value=0.06, type='number', step=0.01, id='k', min=0.01, style={'text-align': 'center'}),
 
                 html.Label('Kp'),
-                dcc.Input(value=110, type='number', step=5, id='kp', min=50, max=250),
+                dcc.Input(value=110, type='number', step=5, id='kp', min=50, style={'text-align': 'center'}),
 
                 html.Label('Ki'),
-                dcc.Input(value=0.05, type='number', step=0.01, id='ki', min=0.01, max=0.25),
+                dcc.Input(value=0.05, type='number', step=0.01, id='ki', min=0.01, style={'text-align': 'center'}),
 
                 html.Label('Kd'),
-                dcc.Input(value=5, type='number', step=1, id='kd', min=1),
+                dcc.Input(value=5, type='number', step=1, id='kd', style={'text-align': 'center'}),
 
                 html.Label('Tp'),
-                dcc.Input(value=0.1, type='number', step=0.001, id='tp', min=0.001, max=1.0),
+                dcc.Input(value=0.1, type='number', step=0.001, id='tp', min=0.001, style={'text-align': 'center'}),
 
                 html.Label('Current water temperature'),
-                dcc.Input(value=20, type='number', step=1, id='current-temperature', min=0, max=100),
+                dcc.Input(value=20, type='number', step=1, id='current-temperature', min=0,
+                          style={'text-align': 'center'}),
 
                 html.Label('Temperature goal'),
-                dcc.Input(value=50, type='number', step=5, id='goal', min=0, max=100),
+                dcc.Input(value=50, type='number', step=5, id='goal', min=0, style={'text-align': 'center'}),
 
                 html.Label('Ambient temperature'),
-                dcc.Input(value=20, type='number', step=1, id='ambient', min=0, max=100),
+                dcc.Input(value=20, type='number', step=1, id='ambient', min=0, style={'text-align': 'center'}),
 
                 html.Label('Simulation time (minutes)'),
-                dcc.Input(value=20, type='number', step=5, id='time', min=5),
+                dcc.Input(value=20, type='number', step=5, id='time', min=5, style={'text-align': 'center'}),
 
-            ], id='user-input'),
+            ], id='user-input', style={
+                'text-align': 'center',
+                'font-size': '14px',
+                'padding': '12px',
+                'width': '25%',
+                'box-sizing': 'border-box',
+                'border': '2px solid  # 0088a9',
+
+                'border-radius': '4px',
+                'background-color': 'darkslategrey',
+                'text-decoration-color': 'azure',
+                'color': 'white',
+            }),
 
             # style={'columnCount': 2}
 
             html.Div(children=[
-
+                dcc.Graph(figure=self.generate_plots())
             ], id='output-graphs')
-        ])
+
+        ], style={
+            'column-count': 2,
+
+            'column-rule-style': 'solid'
+        })
+
+    def _add_subplots(self):
+        figure_titles = ['Delivered heat', 'Heat loss', 'Error', 'Quantity', 'Water temperature']
+        keys = self.__dataframe__.keys()[1:]
+        for i in range(1, 6):
+            # print(f"i: {i} row: {i // 3 + 1} col: {i % 3 + 1}")
+            self.__figure__.add_trace(
+                go.Scatter(
+                    x=self.__dataframe__['Time'],
+                    y=self.__dataframe__[keys[i-1]],
+                    name=figure_titles[i-1]
+                ),
+                row=i // 3 + 1,
+                col=i % 3 + 1
+            )
+
+    def generate_plots(self):
+        self._add_subplots()
+        return self.__figure__
