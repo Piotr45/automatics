@@ -9,7 +9,7 @@ class Simulation:
             'Temperature': [],
             'Sum of errors': []
         }
-        self.__data__['Errors'][0] = 0
+        self.__data__['Errors'].append(0)
 
     @staticmethod
     def minmax(minimum, maximum, value):
@@ -64,6 +64,8 @@ class Simulation:
             self.count_heat_gain(index)
             self.count_heat_loss(index)
             self.update_temperature(index)
+
+        print(self.__data__.keys())
 
 
 tmp = Simulation({
