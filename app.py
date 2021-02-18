@@ -1,5 +1,5 @@
 from flask import Flask
-from simulationwindow import SimulationWindow
+from src.simulationwindow import SimulationWindow
 
 server = Flask(__name__)
 
