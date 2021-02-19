@@ -127,7 +127,6 @@ class SimulationWindow:
 
                 # style={'columnCount': 2}
 
-                # self.generate_graph_div()
                 html.Div(children=[
                     dcc.Graph(figure=self.generate_plots(), animate=True, id='graph')
                 ], id='output-graphs', style={'width': '75%', 'height': 'auto', 'display': 'inline-block'})
@@ -166,12 +165,16 @@ class SimulationWindow:
         self.__figure__ = make_subplots(rows=3, cols=2)
         self.simulation = Simulation(self.create_config(params))
         self.__dataframe__ = DataFrame(self.simulation.simulation())
+
         self._add_subplots()
-        self.__figure__.update_layout({'legend': {'orientation': 'h', 'y': -0.3}})
+        self.__figure__.update_layout({'legend': {'orientation': 'h', }})
         return self.__figure__
 
-    def generate_graph_div(self, params=None):
-        return html.Div(children=[
-            dcc.Graph(figure=self.generate_plots(params), animate=True, id='graph')
-        ], id='output-graphs', style={'width': '75%', 'height': 'auto', 'display': 'inline-block'})
+    # def generate_graph_div(self, params=None):
+    #     return dcc.Graph(figure=self.generate_plots(params), animate=True, id='graph')
+
+    # def generate_graph_div(self, params=None):
+    #     return html.Div(children=[
+    #                 dcc.Graph(figure=self.generate_plots(params), animate=True, id='graph'),
+    #             ], id='output-graphs', style={'width': '75%', 'height': 'auto', 'display': 'inline-block'})
 
