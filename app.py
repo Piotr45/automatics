@@ -1,5 +1,6 @@
 from flask import Flask
 from src.simulationwindow import SimulationWindow
+from dash.dependencies import Output, Input
 
 server = Flask(__name__)
 
@@ -11,9 +12,24 @@ simulation_window = SimulationWindow(server=server, external_stylesheets=externa
 sim_app = simulation_window.app
 
 
+@sim_app.callback(Output('graph', 'figure'),
+                  Input('k', 'value'),
+                  Input('kp', 'value'),
+                  Input('ki', 'value'),
+                  Input('kd', 'value'),
+                  Input('tp', 'value'),
+                  Input('current-temperature', 'value'),
+                  Input('goal', 'value'),
+                  Input('ambient', 'value'),
+                  Input('time', 'value')
+                  )
+def update_plots(k, kp, ki, kd, tp, current_temperature, goal, ambient_temperature, time):
+    return simulation_window.generate_plots([k, kp, ki, kd, tp, current_temperature, goal, ambient_temperature, time])
+
+
 @server.route('/')
 @server.route('/dash')
-def hello_world():
+def simulation_web():
     return sim_app.index()
 
 

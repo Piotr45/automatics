@@ -9,6 +9,7 @@ class Simulation:
             'Temperature': [0] * self.__config__['Simulation cycles'],
             'Time': [_ for _ in range(0, self.__config__['Simulation cycles'])]
         }
+        self.__data__['Temperature'][0] = self.__config__['Current water temperature']
         self.sum_of_errors = 0
 
     @staticmethod
@@ -40,8 +41,8 @@ class Simulation:
 
     def count_heat_gain(self, index) -> None:
         self.__data__['Delivered heat'][index] = (
-                self.__config__['Heat gain maximum'] - self.__config__['Heat gain minimum'] / (self.__config__[
-            'Quantity maximum']) - self.__config__['Quantity minimum'] * self.__data__['Quantity'][index])
+                self.__config__['Heat gain maximum'] - self.__config__['Heat gain minimum']) / (self.__config__[
+            'Quantity maximum'] - self.__config__['Quantity minimum']) * self.__data__['Quantity'][index]
 
     def count_heat_loss(self, index):
         self.__data__['Heat loss'][index] = (self.__config__['Current water temperature'] - self.__config__[
@@ -49,8 +50,8 @@ class Simulation:
 
     def update_temperature(self, index):
         self.__data__['Temperature'][index + 1] = ((self.__data__['Delivered heat'][index] -
-                                                    self.__data__['Heat loss'][index] / self.__config__[
-                                                             'Thermal capacity']) * self.__config__['Tp'] +
+                                                    self.__data__['Heat loss'][index]) / self.__config__[
+                                                             'Thermal capacity'] * self.__config__['Tp'] +
                                                    self.__data__['Temperature'][index])
         self.__config__['Current water temperature'] = self.__data__['Temperature'][index + 1]
 
@@ -68,23 +69,24 @@ class Simulation:
         return self.__data__
 
 
-# tmp = Simulation({
-#             'K': 0.06,
-#             'Kp': 110,
-#             'Ki': 0.05,
-#             'Kd': 5,
-#             'Tp': 0.1,
-#             'Ti': 110/0.05,
-#             'Td': 5/110,
-#             'Current water temperature': 20,
-#             'Temperature goal': 50,
-#             'Ambient temperature': 20,
-#             'Thermal capacity': 555 / 1,
-#             'Quantity minimum': 10,
-#             'Quantity maximum': 2200,
-#             'Heat gain minimum': 0,
-#             'Heat gain maximum': 41900,
-#             'Simulation cycles': 300
-#         })
-#
-# tmp.simulation()
+tmp = Simulation({
+            'K': 0.06,
+            'Kp': 110,
+            'Ki': 0.05,
+            'Kd': 5,
+            'Tp': 0.1,
+            'Ti': 110/0.05,
+            'Td': 5/110,
+            'Current water temperature': 20,
+            'Temperature goal': 50,
+            'Ambient temperature': 20,
+            'Thermal capacity': 555 / 1,
+            'Quantity minimum': 10,
+            'Quantity maximum': 2200,
+            'Heat gain minimum': 0,
+            'Heat gain maximum': 41900,
+            'Simulation cycles': 300
+        })
+
+tmp.simulation()
+
