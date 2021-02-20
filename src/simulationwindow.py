@@ -5,7 +5,7 @@ from pandas import DataFrame
 import plotly.graph_objects as go
 from plotly.graph_objs.scatter import Line
 from plotly.subplots import make_subplots
-from simulation import Simulation
+from .simulation import Simulation
 
 
 class SimulationWindow:
@@ -115,10 +115,11 @@ class SimulationWindow:
                     'font-size': '14px',
                     'padding': '12px',
                     'width': '25%',
+                    # 'height': '10px',
                     'box-sizing': 'border-box',
                     'border': '2px solid  # 0088a9',
 
-                    'border-radius': '4px',
+                    # 'border-radius': '4px',
                     'background-color': 'darkslategrey',
                     'text-decoration-color': 'azure',
                     'color': 'white',
@@ -129,7 +130,7 @@ class SimulationWindow:
 
                 html.Div(children=[
                     dcc.Graph(figure=self.generate_plots(), animate=True, id='graph')
-                ], id='output-graphs', style={'width': '75%', 'height': 'auto', 'display': 'inline-block'})
+                ], id='output-graphs', style={'width': '75%', 'display': 'inline-block'})
             ], id='sub-main-div', )
         ])
 
@@ -167,14 +168,9 @@ class SimulationWindow:
         self.__dataframe__ = DataFrame(self.simulation.simulation())
 
         self._add_subplots()
-        self.__figure__.update_layout({'legend': {'orientation': 'h', }})
+        self.__figure__.update_layout({'legend': {'orientation': 'h', }}, width= 1000, height= 700)
         return self.__figure__
 
-    # def generate_graph_div(self, params=None):
-    #     return dcc.Graph(figure=self.generate_plots(params), animate=True, id='graph')
 
-    # def generate_graph_div(self, params=None):
-    #     return html.Div(children=[
-    #                 dcc.Graph(figure=self.generate_plots(params), animate=True, id='graph'),
-    #             ], id='output-graphs', style={'width': '75%', 'height': 'auto', 'display': 'inline-block'})
+
 
